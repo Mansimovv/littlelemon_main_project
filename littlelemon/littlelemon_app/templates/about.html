@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haqqında - Little Lemon</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        header { background-color: #4CAF50; color: white; padding: 1rem 0; text-align: center; }
+        header nav ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; gap: 20px; }
+        header nav a { color: white; text-decoration: none; font-weight: bold; font-size: 1.2rem; transition: color 0.3s; }
+        header nav a:hover { color: #ffeb3b; }
+        main { padding: 2rem; max-width: 900px; margin: auto; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; margin-top: 2rem; }
+        h1 { color: #d42921; text-align: center; margin-bottom: 2rem; }
+        footer { text-align: center; padding: 1rem; background-color: #333; color: white; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'index' %}">Ana Səhifə</a></li>
+                <li><a href="{% url 'about' %}">Haqqında</a></li>
+                <li><a href="{% url 'menu' %}">Menyu</a></li>
+                <li><a href="{% url 'book' %}">Rezervasiya</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="about-us">
+            <h1>Haqqımızda</h1>
+            <p>Little Lemon, təzə, yerli məhsullardan hazırlanmış yeməkləri ilə tanınan bir ailə restoranıdır. Bizim missiyamız, hər bir müştəriyə unudulmaz bir dad təcrübəsi təqdim etməkdir.</p>
+            <p>Aşpazlarımız sizə ənənəvi reseptləri müasir toxunuşlarla təqdim etməkdən qürur duyur.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Little Lemon Restoranı. Bütün hüquqlar qorunur.</p>
+    </footer>
+</body>
+</html>
