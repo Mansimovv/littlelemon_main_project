@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Rezervasiya Et</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
+        .button-reserve { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+        .bookings-list { margin-top: 20px; }
+        .booking-item { background-color: #f9f9f9; padding: 10px; border-left: 5px solid #4CAF50; margin-bottom: 10px; }
+        .unavailable { background-color: #ccc !important; cursor: not-allowed; }
+        .message { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rezervasiya Et</h1>
+
+        <form id="reservation-form">
+            <div class="form-group">
+                <label for="name">Ad:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="reservation-date">Rezervasiya Tarixi:</label>
+                <input type="date" id="reservation-date" name="reservation-date" required>
+            </div>
+            <div class="form-group">
+                <label for="reservation-time">Rezervasiya Zamanı:</label>
+                <select id="reservation-time" name="reservation-time" required>
+                    <option value="">Vaxt seçin</option>
+                    </select>
+            </div>
+            <button type="submit" class="button-reserve">Rezervasiya Et</button>
+        </form>
+
+        <div class="bookings-list">
+            <h3>Mövcud Rezervasiyalar (<span id="selected-date-display"></span>)</h3>
+            <div id="booking-slots-display">
+                </div>
+            <p id="no-bookings" style="display: none;">Bu tarixdə rezervasiya yoxdur.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('reservation-form');
+        const reservationDateInput = document.getElementById('reservation-date');
+        const reservationTimeSelect = document.getElementById('reservation-time');
+        const bookingSlotsDisplay = document.getElementById('booking-slots-display');
+        const selectedDateDisplay = document.getElementById('selected-date-display');
+        const noBookingsMessage = document.getElementById('no-bookings');
+
+        const availableSlots = [
+            '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00',
+            '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00',
+            '19:30', '20:00', '20:30', '21:00'
+        ];
+
+        function renderAvailableSlots(bookedSlots = []) {
+            reservationTimeSelect.innerHTML = '<option value="">Vaxt seçin</option>';
+            availableSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot;
+                option.textContent = slot;
+                if (bookedSlots.includes(slot)) {
+                    option.disabled = true;
+                    option.classList.add('unavailable');
+                }
+                reservationTimeSelect.appendChild(option);
+            });
+        }
+
+        async function fetchBookingsForDate(date) {
+            const response = await fetch(`/bookings?date=${date}`);
+            const data = await response.json();
+            return data;
+        }
+
+        async function updateBookingsDisplay(date) {
+            selectedDateDisplay.textContent = date;
+            const bookings = await fetchBookingsForDate(date);
+
+            bookingSlotsDisplay.innerHTML = '';
+            const bookedSlots = bookings.map(b => b.reservation_slot.substring(0, 5));
+
+            if (bookings.length === 0) {
+                noBookingsMessage.style.display = 'block';
+            } else {
+                noBookingsMessage.style.display = 'none';
+                bookings.forEach(booking => {
+                    const div = document.createElement('div');
+                    div.className = 'booking-item';
+                    div.innerHTML = `<strong>${booking.first_name}</strong> - ${booking.reservation_slot.substring(0, 5)}`;
+                    bookingSlotsDisplay.appendChild(div);
+                });
+            }
+
+            renderAvailableSlots(bookedSlots);
+        }
+
+        // Səhifə yüklənəndə cari tarixi seçir və rezervasiyaları göstərir
+        window.addEventListener('load', () => {
+            const today = new Date().toISOString().split('T')[0];
+            reservationDateInput.value = today;
+            updateBookingsDisplay(today);
+        });
+
+        // Tarix dəyişdikdə rezervasiyaları yeniləyir
+        reservationDateInput.addEventListener('change', (e) => {
+            const selectedDate = e.target.value;
+            updateBookingsDisplay(selectedDate);
+        });
+
+        // Formun göndərilməsi
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const firstName = document.getElementById('name').value;
+            const reservationDate = reservationDateInput.value;
+            const reservationSlot = reservationTimeSelect.value;
+
+            if (!firstName || !reservationDate || !reservationSlot) {
+                alert('Lütfən bütün sahələri doldurun.');
+                return;
+            }
+
+            const data = {
+                first_name: firstName,
+                reservation_date: reservationDate,
+                reservation_slot: reservationSlot
+            };
+
+            const response = await fetch('/bookings/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Rezervasiyanız uğurla qəbul edildi!');
+                form.reset();
+                updateBookingsDisplay(reservationDate); // Rezervasiyaları yeniləyin
+            } else {
+                alert('Rezervasiya zamanı xəta baş verdi.');
+            }
+        });
+    </script>
+</body>
+</html>

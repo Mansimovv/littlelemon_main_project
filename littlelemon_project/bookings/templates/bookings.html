@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Bütün Rezervasiyalar</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
+        pre { background-color: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bütün Rezervasiyalar JSON Verisi</h1>
+        <p>Bu səhifə API uç nöqtəsindən gələn JSON verisini göstərir.</p>
+        <pre>{{ bookings|json_script:"bookings_data" }}</pre>
+        <script>
+            const bookingsData = JSON.parse(document.getElementById('bookings_data').textContent);
+            document.querySelector('pre').textContent = JSON.stringify(bookingsData, null, 2);
+        </script>
+    </div>
+</body>
+</html>
